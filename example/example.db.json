@@ -1,0 +1,38 @@
+[
+  {
+    "model": "posts.post",
+    "pk": 1,
+    "fields": {
+      "title": "Fusce fringilla laoreet augue",
+      "slug": "abc",
+      "content": "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?"
+    }
+  },
+  {
+    "model": "posts.post",
+    "pk": 2,
+    "fields": {
+      "title": "Integer sit amet interdum lorem, at porta dolor",
+      "slug": "abc-1",
+      "content": "Quisque in magna eget dui scelerisque dictum. Aenean feugiat tincidunt fringilla. Quisque semper semper leo, a commodo quam. Quisque sodales tempus mauris, vitae tristique mauris tincidunt eget. Sed vitae cursus turpis, in iaculis diam. Sed viverra dapibus ante quis vehicula. Morbi ultrices sem vel ultricies fermentum. Pellentesque metus mi, efficitur sed augue eu, rhoncus commodo nisl. Integer tincidunt non nunc nec fermentum."
+    }
+  },
+  {
+    "model": "posts.post",
+    "pk": 3,
+    "fields": {
+      "title": "Pellentesque dolor elit",
+      "slug": "abc-2",
+      "content": "Phasellus efficitur efficitur nisl vel dapibus. Integer accumsan ornare magna ut mollis. Aenean laoreet varius ante a euismod. Mauris quis odio nisl. Phasellus egestas sed libero in elementum. Praesent fermentum, tortor non pellentesque facilisis, ligula nibh gravida ipsum, non luctus ex nisl sed arcu. Ut convallis aliquam dolor, vitae aliquam nisl rhoncus in."
+    }
+  },
+  {
+    "model": "posts.post",
+    "pk": 4,
+    "fields": {
+      "title": "Quisque lacinia dui non ligula pharetra",
+      "slug": "abc-3",
+      "content": "Vestibulum varius lacus ut sem sollicitudin, malesuada fermentum urna rhoncus. Vivamus iaculis dictum justo. Duis lobortis tincidunt efficitur. Donec libero ipsum, fringilla id luctus scelerisque, vestibulum ac enim. Nam commodo hendrerit ante, at molestie augue commodo sed. Fusce mauris quam, iaculis vitae ipsum in, ullamcorper molestie ligula. Etiam tortor nibh, elementum at urna et, euismod euismod elit. Fusce ut ex enim."
+    }
+  }
+]
