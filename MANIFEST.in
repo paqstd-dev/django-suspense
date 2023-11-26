@@ -1,0 +1,8 @@
+include LICENSE
+include README.md
+recursive-include suspense/templates *
+
+exclude manage.py
+recursive-exclude config *
+recursive-exclude example *
+recursive-exclude tests *
