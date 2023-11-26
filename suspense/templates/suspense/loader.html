@@ -4,7 +4,7 @@
     <script>
         fetch('{% url "django_suspense_loader" %}', {
             headers: {
-                SUSPENSE_UID: "{{uid}}"
+                "X-Suspense-UID": "{{uid}}"
             }
         }).then(async (data) => {
             document.getElementById('suspense-loader-{{ uid }}').innerHTML = await data.text();

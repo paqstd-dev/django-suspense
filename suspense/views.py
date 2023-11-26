@@ -4,4 +4,4 @@ from suspense.futures import get
 
 
 def django_suspense_loader(request):
-    return HttpResponse(get(request.headers.get('SUSPENSE_UID')))
+    return HttpResponse(get(request.headers.get('X-Suspense-Uid')))
