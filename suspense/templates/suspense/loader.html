@@ -2,7 +2,11 @@
     {{ loading }}
 
     <script>
-        fetch('{% url "django_suspense_loader" %}', {headers: {SUSPENSE_UID: uid}}).then(async (data) => {
+        fetch('{% url "django_suspense_loader" %}', {
+            headers: {
+                SUSPENSE_UID: "{{uid}}"
+            }
+        }).then(async (data) => {
             document.getElementById('suspense-loader-{{ uid }}').innerHTML = await data.text();
         })
     </script>
