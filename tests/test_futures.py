@@ -1,27 +1,19 @@
-from concurrent.futures import Future
+from inspect import iscoroutine
 
+import pytest
 from django import template
 
-from suspense.futures import __futures, create, get
+from suspense.futures import create
 
 
-def test_create_future():
+@pytest.mark.asyncio
+async def test_create_future():
     nodelist = template.base.NodeList()
     context = template.context.Context()
 
-    uid = create(nodelist, context)
-    assert isinstance(__futures[uid], Future)
-
-
-def test_get_future():
-    nodelist = template.engines['django'].from_string(
-        "{% for x in y %}{{x}}{% endfor %}"
-    )
-    context = {'y': 'abc'}
-
-    uid = create(nodelist, context)
-    assert get(uid) == 'abc'
-
-
-def test_get_None_key():
-    assert get('incorrect-key') is None
+    uid, task = create(nodelist, context)
+    assert iscoroutine(task)
+    result = await task
+    assert isinstance(result, tuple)
+    assert result[0] == uid
+    assert result[1] == ''

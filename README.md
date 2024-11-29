@@ -42,23 +42,14 @@ TEMPLATES = [
 ```
 If you choose not use it as a built-in, you will need to add `{% load suspense %}` to the top of your template whenever you want to use suspense.
 
-### 2. Add `suspense` to `urls.py`:
-This is necessary because some parts of the pages will be loaded asynchronously (via http).
-```python
-from django.urls import include, path
 
-
-urlpatterns = [
-    ...,
-    path('/_suspense/', include('suspense.urls'))
-]
-```
-
-### 3. Create view with slow lazy load object:
+### 2. Create view with slow lazy load object:
 Because django executes database queries lazily, they may sometimes not work as expected. Let's try to create a very slow but lazy object and write a view function:
 ```python
+from suspense.shortcuts import render
+
 # app/views.py
-def view(request):
+async def view(request):
     def obj():
         import time
 
@@ -71,7 +62,7 @@ def view(request):
     return render(request, 'template.html', {'obj': obj})
 ```
 
-### 4. Use `suspense` in your template:
+### 3. Use `suspense` in your template:
 Let's now add the output of the received data to the template. At this point, we still haven't made a database query, so we can easily and quickly show the template right away.
 ```html
 {% load suspense %}
@@ -92,7 +83,7 @@ Let's now add the output of the received data to the template. At this point, we
 ```
 Once obj is ready for use, we will show it. But until it is ready, fallback works. While we are waiting for the data to be displayed, a request is made on the client side.
 
-### 5. Hooray! Everything is ready to use it.
+### 4. Hooray! Everything is ready to use it.
 
 
 ## Contributing

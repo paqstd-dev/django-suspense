@@ -29,7 +29,11 @@ class SuspenseNode(template.Node):
         self.nodelist = nodelist
 
     def render(self, context):
-        uid = create(self.nodelist, context)
+        uid, task = create(self.nodelist, context)
+        request = context["request"]
+        if not hasattr(request, "_suspense"):
+            request._suspense = []
+        request._suspense.append(task)
 
         return template.loader.render_to_string(
             'suspense/loader.html',
