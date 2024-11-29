@@ -1,12 +1,8 @@
-from asyncio import iscoroutine
-
-import pytest
 from django import template
 from django.http import HttpRequest
 
 
-@pytest.mark.asyncio
-async def test_suspense():
+def test_suspense():
     mock_request = HttpRequest()
     html = (
         template.engines['django']
@@ -27,15 +23,13 @@ async def test_suspense():
     assert isinstance(mock_request._suspense, list)
     assert len(mock_request._suspense) == 1
     task = mock_request._suspense[0]
-    assert iscoroutine(task)
-    result = await task
+    result = task()
     assert isinstance(result, tuple)
     assert isinstance(result[0], str)
     assert 'abcdefg' in result[1]
 
 
-@pytest.mark.asyncio
-async def test_fallback():
+def test_fallback():
     mock_request = HttpRequest()
     html = (
         template.engines['django']
@@ -60,8 +54,7 @@ async def test_fallback():
     assert isinstance(mock_request._suspense, list)
     assert len(mock_request._suspense) == 1
     task = mock_request._suspense[0]
-    assert iscoroutine(task)
-    result = await task
+    result = task()
     assert isinstance(result, tuple)
     assert isinstance(result[0], str)
     assert 'abcdefg' in result[1]
