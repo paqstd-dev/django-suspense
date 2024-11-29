@@ -9,6 +9,6 @@ async def test_render():
     request = HttpRequest()
     response = render(request, "test.html")
     streaming_content = response.streaming_content
-    assert (await anext(streaming_content)) == b'foo\n'
+    assert (await streaming_content.__anext__()) == b'foo\n'
     with pytest.raises(StopAsyncIteration):
-        await anext(streaming_content)
+        await streaming_content.__anext__()
