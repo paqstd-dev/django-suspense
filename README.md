@@ -6,7 +6,12 @@
 
 Django Suspense is small package to easily display a fallback in templates until children have finished loading.
 
+
 ## Quick start
+
+### 0. Requirements:
+It requires to use an [ASGI server](https://docs.djangoproject.com/en/dev/howto/deployment/asgi/#how-to-deploy-with-asgi) because of the async nature of the implementation.
+
 ### 1. Install package:
 To get started, install the package from [pypi](https://pypi.org/project/django-suspense/):
 ```bash
@@ -46,18 +51,17 @@ If you choose not use it as a built-in, you will need to add `{% load suspense %
 ### 2. Create view with slow lazy load object:
 Because django executes database queries lazily, they may sometimes not work as expected. Let's try to create a very slow but lazy object and write a view function:
 ```python
+import asyncio
+
 from suspense.shortcuts import render
+from asgiref.sync import async_to_sync
 
 # app/views.py
 async def view(request):
-    def obj():
-        import time
-
-        i = 0
-        while i < 10:
-            yield i
-            i += 1
-            time.sleep(1)
+    @async_to_sync
+    async def obj():
+        await asyncio.sleep(1)
+        return range(10)
 
     return render(request, 'template.html', {'obj': obj})
 ```
