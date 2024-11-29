@@ -1,7 +1,7 @@
 from asgiref.sync import sync_to_async
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 
-from suspense.shortcuts import render
+from suspense.shortcuts import render as suspense_render
 from suspense.views import SuspenseTemplateView
 
 from .models import Post
@@ -10,7 +10,7 @@ from .models import Post
 async def posts(request):
     posts = Post.objects.all()
 
-    return render(request, 'posts/all.html', {'posts': posts})
+    return suspense_render(request, 'posts/all.html', {'posts': posts})
 
 
 async def post(request, slug):
