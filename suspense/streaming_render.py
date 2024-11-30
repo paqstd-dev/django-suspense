@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from concurrent import futures
 
@@ -30,8 +29,6 @@ def streaming_render(request, template_name, context=None, using=None):
                     uid, result = task.result()
                     escaped_string = result.replace('`', '\\`')
                     yield get_html(uid, escaped_string)
-                except asyncio.CancelledError:
-                    pass
                 except Exception:
                     logger.exception(
                         f'failed to render suspense template {template_name}"'
