@@ -48,13 +48,13 @@ If you choose not use it as a built-in, you will need to add `{% load suspense %
 ### 2. Create view with slow lazy load object:
 Because django executes database queries lazily, they may sometimes not work as expected. Let's try to create a very slow but lazy object and write a view function:
 ```python
-import time
-
 from suspense.shortcuts import render
 
 # app/views.py
-async def view(request):
+def view(request):
     def obj():
+        import time
+
         time.sleep(1)
         return range(10)
 
