@@ -32,12 +32,9 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
+                # ... list of default processors
             ],
-            "builtins": ["suspense.templatetags.suspense"],
+            "builtins": ["suspense.templatetags.suspense"], # <--
         },
     },
 ]
@@ -63,24 +60,24 @@ def view(request):
 
 ### 3. Use `suspense` in your template:
 Let's now add the output of the received data to the template. At this point, we still haven't made a database query, so we can easily and quickly show the template right away.
-```html
+```jinja
 {% load suspense %}
 
-<div class="list">
+<ul>
     {% suspense %}
         {% fallback %}
-            <div class="skeleton">Loading ... </div>
+            <li class="skeleton">Loading ... </li>
         {% endfallback %}
 
-        <ul>
-            {% for data in obj %}
-                <li>{{ data }}</li>
-            {% endfor %}
-        </ul>
+        {% for data in obj %}
+            <li>{{ data }}</li>
+        {% endfor %}
     {% endsuspense %}
-</div>
+</ul>
 ```
 Once obj is ready for use, we will show it. But until it is ready, fallback works. While we are waiting for the data to be displayed, a request is made on the client side.
+
+> Suspense does not add additional DOM elements after rendering the final result. That's why syntactically the code above will be valid.
 
 ### 4. Hooray! Everything is ready to use it.
 
@@ -99,7 +96,7 @@ See [webkit issue #252413](https://bugs.webkit.org/show_bug.cgi?id=252413)
 
 If you are experiencing this issue, you can use the additional `{% webkit_extra_invisible_bytes %}` template tag to add a few extra invisible bytes in Safari.
 
-```html
+```jinja
 {% load suspense %}
 
 {% webkit_extra_invisible_bytes %}
@@ -107,7 +104,7 @@ If you are experiencing this issue, you can use the additional `{% webkit_extra_
 
 By default the `webkit_extra_invisible_bytes` adds 200 bytes but you can specify a different amount:
 
-```html
+```jinja
 {% webkit_extra_invisible_bytes 300 %}
 ```
 
@@ -119,8 +116,9 @@ You can override the `suspense/replacer.html` template and add the `nonce` attri
 
 With [django-csp](https://django-csp.readthedocs.io/en/latest/nonce.html#middleware):
 
-```html
+```jinja
 {% extends "suspense/replacer.html" %}
+
 {% block script_attributes %}nonce="{{request.csp_nonce}}"{% endblock %}
 ```
 

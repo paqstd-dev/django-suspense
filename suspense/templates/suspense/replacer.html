@@ -1,3 +1,4 @@
 <script {% block script_attributes %}{% endblock %}>
-    document.getElementById("suspense-loader-{{uid}}").innerHTML = `{{escaped_string | safe}}`;
+    document.getElementById("suspense-loader-{{uid}}").outerHTML = `{{escaped_string | safe}}`;
+    document.currentScript.remove()
 </script>
