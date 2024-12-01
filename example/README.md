@@ -28,7 +28,7 @@ python manage.py loaddata example.db.json
 This command will add several posts with title and content.
 
 ## Run server
-Now that everything is ready, you can start the asgi server:
+Now that everything is ready, you can start the local server:
 ```bash
 PYTHONPATH=$PWD/../ ./manage.py runserver
 ```

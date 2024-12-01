@@ -3,4 +3,3 @@ Django==4.2.7
 sqlparse==0.4.4
 
 #django-suspense
-uvicorn==0.32.1
