@@ -1,0 +1,3 @@
+<script {% block script_attributes %}{% endblock %}>
+    document.getElementById("suspense-loader-{{uid}}").innerHTML = `{{escaped_string | safe}}`;
+</script>

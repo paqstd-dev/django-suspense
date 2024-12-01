@@ -3,7 +3,7 @@ from django.http import HttpRequest
 
 
 def test_suspense():
-    mock_request = HttpRequest()
+    request = HttpRequest()
     html = (
         template.engines['django']
         .from_string(
@@ -15,14 +15,14 @@ def test_suspense():
         {% endsuspense %}
     """
         )
-        .render(context={"request": mock_request})
+        .render(context={"request": request})
     )
 
     assert 'abcdefg' not in html
-    assert hasattr(mock_request, "_suspense")
-    assert isinstance(mock_request._suspense, list)
-    assert len(mock_request._suspense) == 1
-    task = mock_request._suspense[0]
+    assert hasattr(request, "_suspense")
+    assert isinstance(request._suspense, list)
+    assert len(request._suspense) == 1
+    task = request._suspense[0]
     result = task()
     assert isinstance(result, tuple)
     assert isinstance(result[0], str)
@@ -30,7 +30,7 @@ def test_suspense():
 
 
 def test_fallback():
-    mock_request = HttpRequest()
+    request = HttpRequest()
     html = (
         template.engines['django']
         .from_string(
@@ -45,16 +45,51 @@ def test_fallback():
         {% endsuspense %}
     """
         )
-        .render(context={"request": mock_request})
+        .render(context={"request": request})
     )
 
     assert 'abcdefg' not in html
     assert 'loading...' in html
-    assert hasattr(mock_request, "_suspense")
-    assert isinstance(mock_request._suspense, list)
-    assert len(mock_request._suspense) == 1
-    task = mock_request._suspense[0]
+    assert hasattr(request, "_suspense")
+    assert isinstance(request._suspense, list)
+    assert len(request._suspense) == 1
+    task = request._suspense[0]
     result = task()
     assert isinstance(result, tuple)
     assert isinstance(result[0], str)
     assert 'abcdefg' in result[1]
+
+
+def test_webkit_extra_invisible_bytes_not_webkit():
+    request = HttpRequest()
+    html = (
+        template.engines['django']
+        .from_string(
+            """
+        {% load suspense %}
+
+        {% webkit_extra_invisible_bytes 10 %}
+    """
+        )
+        .render(context={"request": request})
+    )
+
+    assert 'div' not in html
+
+
+def test_webkit_extra_invisible_bytes_webkit():
+    request = HttpRequest()
+    request.META['HTTP_USER_AGENT'] = '... AppleWebKit/605.1.15 ...'
+    html = (
+        template.engines['django']
+        .from_string(
+            """
+        {% load suspense %}
+
+        {% webkit_extra_invisible_bytes 2 %}
+    """
+        )
+        .render(context={"request": request})
+    )
+
+    assert '<div style="width: 0;height:0">\u200b\u200b</div>' not in html

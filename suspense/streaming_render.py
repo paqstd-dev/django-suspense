@@ -6,13 +6,6 @@ from django.template import loader
 logger = logging.getLogger(__name__)
 
 
-def get_html(uid, escaped_string):
-    return f"""<script>
-        document.getElementById("suspense-loader-{uid}").innerHTML = `{escaped_string}`;
-    </script>
-    """
-
-
 def streaming_render(request, template_name, context=None, using=None):
     content = loader.render_to_string(template_name, context, request, using=using)
     if hasattr(request, "_suspense"):
@@ -28,8 +21,17 @@ def streaming_render(request, template_name, context=None, using=None):
                 try:
                     uid, result = task.result()
                     escaped_string = result.replace('`', '\\`')
-                    yield get_html(uid, escaped_string)
+                    yield loader.render_to_string(
+                        "suspense/replacer.html",
+                        {
+                            "uid": uid,
+                            "escaped_string": escaped_string,
+                            "request": request,
+                        },
+                        request,
+                        using=using,
+                    )
                 except Exception:
                     logger.exception(
-                        f'failed to render suspense template {template_name}"'
+                        f'failed to render suspense template "{template_name}"'
                     )

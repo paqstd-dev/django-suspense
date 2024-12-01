@@ -85,6 +85,33 @@ Once obj is ready for use, we will show it. But until it is ready, fallback work
 ### 4. Hooray! Everything is ready to use it.
 
 
+## Troubleshooting
+
+### Safari delay in rendering
+
+On Safari if your webpage is very light/simple, you may experience a delay in rendering.
+
+Ex: the page renders only after some django-suspense or all content is downloaded.
+
+WebKit has an issue with streaming responses requiring a certain amount of visible content before to actually start rendering.
+
+See [webkit issue #252413](https://bugs.webkit.org/show_bug.cgi?id=252413)
+
+If you are experiencing this issue, you can use the additional `{% webkit_extra_invisible_bytes %}` template tag to add a few extra invisible bytes in Safari.
+
+```html
+{% load suspense %}
+
+{% webkit_extra_invisible_bytes %}
+```
+
+By default the `webkit_extra_invisible_bytes` adds 200 bytes but you can specify a different amount:
+
+```html
+{% webkit_extra_invisible_bytes 300 %}
+```
+
+
 ## Contributing
 If you would like to suggest a new feature, you can create an issue on the GitHub repository for this project.
 Also you can fork the repository and submit a pull request with your changes.
