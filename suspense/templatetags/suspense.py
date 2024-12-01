@@ -63,10 +63,9 @@ class FallbackNode(template.Node):
 
 
 @register.simple_tag(name="webkit_extra_invisible_bytes", takes_context=True)
-def webkit_extra_invisible_bytes(context, invisible_bytes=200):
+def webkit_extra_invisible_bytes(context, byte_count=200):
     agent = context["request"].META.get('HTTP_USER_AGENT', '')
-    if invisible_bytes > 0 and 'AppleWebKit' in agent:
-        return mark_safe(
-            f'<div style="width: 0; height: 0;">{invisible_bytes*"\u200b"}</div>'
-        )
+    if byte_count > 0 and 'AppleWebKit' in agent:
+        zero_width_spaces = byte_count * "\u200b"
+        return mark_safe(f'<div style="width: 0; height: 0;">{zero_width_spaces}</div>')
     return ''
