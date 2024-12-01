@@ -12,7 +12,7 @@ authors = [
 ]
 description = "Display a fallback in templates until its children have finished loading."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
     "Environment :: Web Environment",
     "Framework :: Django",
@@ -24,10 +24,11 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 
 [project.urls]
@@ -56,3 +57,6 @@ include_trailing_comma = true
 line_length = 88
 multi_line_output = 3
 known_first_party = ["config"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.tests"

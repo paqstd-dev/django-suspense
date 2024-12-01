@@ -6,7 +6,9 @@
 
 Django Suspense is small package to easily display a fallback in templates until children have finished loading.
 
+
 ## Quick start
+
 ### 1. Install package:
 To get started, install the package from [pypi](https://pypi.org/project/django-suspense/):
 ```bash
@@ -42,36 +44,24 @@ TEMPLATES = [
 ```
 If you choose not use it as a built-in, you will need to add `{% load suspense %}` to the top of your template whenever you want to use suspense.
 
-### 2. Add `suspense` to `urls.py`:
-This is necessary because some parts of the pages will be loaded asynchronously (via http).
-```python
-from django.urls import include, path
 
-
-urlpatterns = [
-    ...,
-    path('/_suspense/', include('suspense.urls'))
-]
-```
-
-### 3. Create view with slow lazy load object:
+### 2. Create view with slow lazy load object:
 Because django executes database queries lazily, they may sometimes not work as expected. Let's try to create a very slow but lazy object and write a view function:
 ```python
+from suspense.shortcuts import render
+
 # app/views.py
 def view(request):
     def obj():
         import time
 
-        i = 0
-        while i < 10:
-            yield i
-            i += 1
-            time.sleep(1)
+        time.sleep(1)
+        return range(10)
 
     return render(request, 'template.html', {'obj': obj})
 ```
 
-### 4. Use `suspense` in your template:
+### 3. Use `suspense` in your template:
 Let's now add the output of the received data to the template. At this point, we still haven't made a database query, so we can easily and quickly show the template right away.
 ```html
 {% load suspense %}
@@ -92,7 +82,47 @@ Let's now add the output of the received data to the template. At this point, we
 ```
 Once obj is ready for use, we will show it. But until it is ready, fallback works. While we are waiting for the data to be displayed, a request is made on the client side.
 
-### 5. Hooray! Everything is ready to use it.
+### 4. Hooray! Everything is ready to use it.
+
+
+## Troubleshooting
+
+### Safari delay in rendering
+
+On Safari if your webpage is very light/simple, you may experience a delay in rendering.
+
+Ex: the page renders only after some django-suspense or all content is downloaded.
+
+WebKit has an issue with streaming responses requiring a certain amount of visible content before to actually start rendering.
+
+See [webkit issue #252413](https://bugs.webkit.org/show_bug.cgi?id=252413)
+
+If you are experiencing this issue, you can use the additional `{% webkit_extra_invisible_bytes %}` template tag to add a few extra invisible bytes in Safari.
+
+```html
+{% load suspense %}
+
+{% webkit_extra_invisible_bytes %}
+```
+
+By default the `webkit_extra_invisible_bytes` adds 200 bytes but you can specify a different amount:
+
+```html
+{% webkit_extra_invisible_bytes 300 %}
+```
+
+### Content Security Policy (CSP) nonce error because of `strict-dynamic`
+
+If you are using a Content Security Policy (CSP) with `nonce` and [`strict-dynamic`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src#strict-dynamic), you may need to add the `nonce` attribute to the script tag.
+
+You can override the `suspense/replacer.html` template and add the `nonce` attribute to the script tag.
+
+With [django-csp](https://django-csp.readthedocs.io/en/latest/nonce.html#middleware):
+
+```html
+{% extends "suspense/replacer.html" %}
+{% block script_attributes %}nonce="{{request.csp_nonce}}"{% endblock %}
+```
 
 
 ## Contributing

@@ -1,0 +1,5 @@
+{% load suspense %}
+{% suspense %}
+    {% fallback %}foo{% endfallback %}
+    {% for a in bar_loader %}{{ a }}{% endfor %}
+{% endsuspense %}

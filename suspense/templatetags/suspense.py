@@ -1,4 +1,7 @@
+from copy import copy
+
 from django import template
+from django.utils.safestring import mark_safe
 
 from suspense.futures import create
 
@@ -29,7 +32,11 @@ class SuspenseNode(template.Node):
         self.nodelist = nodelist
 
     def render(self, context):
-        uid = create(self.nodelist, context)
+        uid, task = create(self.nodelist, copy(context))
+        request = context["request"]
+        if not hasattr(request, "_suspense"):
+            request._suspense = []
+        request._suspense.append(task)
 
         return template.loader.render_to_string(
             'suspense/loader.html',
@@ -53,3 +60,12 @@ class FallbackNode(template.Node):
         if self.nodelist:
             return self.nodelist.render(context)
         return ''
+
+
+@register.simple_tag(name="webkit_extra_invisible_bytes", takes_context=True)
+def webkit_extra_invisible_bytes(context, byte_count=200):
+    agent = context["request"].META.get('HTTP_USER_AGENT', '')
+    if byte_count > 0 and 'AppleWebKit' in agent:
+        zero_width_spaces = byte_count * "\u200b"
+        return mark_safe(f'<div style="width: 0; height: 0;">{zero_width_spaces}</div>')
+    return ''

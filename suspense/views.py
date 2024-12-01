@@ -1,7 +1,7 @@
-from django.http import HttpResponse
+from django.views.generic import TemplateView
 
-from suspense.futures import get
+from suspense.http import SuspenseTemplateResponse
 
 
-def django_suspense_loader(request):
-    return HttpResponse(get(request.headers.get('X-Suspense-Uid')))
+class SuspenseTemplateView(TemplateView):
+    response_class = SuspenseTemplateResponse

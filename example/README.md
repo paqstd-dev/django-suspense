@@ -30,5 +30,5 @@ This command will add several posts with title and content.
 ## Run server
 Now that everything is ready, you can start the local server:
 ```bash
-python manage.py runserver
+PYTHONPATH=$PWD/../ ./manage.py runserver
 ```
