@@ -111,6 +111,19 @@ By default the `webkit_extra_invisible_bytes` adds 200 bytes but you can specify
 {% webkit_extra_invisible_bytes 300 %}
 ```
 
+### Content Security Policy (CSP) nonce error because of `strict-dynamic`
+
+If you are using a Content Security Policy (CSP) with `nonce` and [`strict-dynamic`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src#strict-dynamic), you may need to add the `nonce` attribute to the script tag.
+
+You can override the `suspense/replacer.html` template and add the `nonce` attribute to the script tag.
+
+With [django-csp](https://django-csp.readthedocs.io/en/latest/nonce.html#middleware):
+
+```html
+{% extends "suspense/replacer.html" %}
+{% block script_attributes %}nonce="{{request.csp_nonce}}"{% endblock %}
+```
+
 
 ## Contributing
 If you would like to suggest a new feature, you can create an issue on the GitHub repository for this project.
