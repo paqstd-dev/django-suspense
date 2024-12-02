@@ -122,6 +122,62 @@ With [django-csp](https://django-csp.readthedocs.io/en/latest/nonce.html#middlew
 {% block script_attributes %}nonce="{{request.csp_nonce}}"{% endblock %}
 ```
 
+## ASGI support
+
+Async views with an ASGI server is also supported.
+
+```python
+import asyncio
+
+from suspense.shortcuts import async_render
+
+# app/views.py
+async def view(request):
+    async def obj():
+
+        await asyncio.sleep(1)
+        return range(10)
+
+    return async_render(request, 'template.html', {'obj': asyncio.create_task(obj())})
+```
+
+Suspense will wait for any awaitable object to finish before rendering the suspense tags.
+
+However you must take the following in consideration:
+- synchronous streaming response with AGSI will wait for the full render before sending the response to the client.
+
+### Specify which awaitable to wait for
+
+If you have multiple suspense blocks with different awaitable, you can specify which awaitable to wait for.
+
+Ex: `{% suspense obj %}`
+
+```jinja
+{% load suspense %}
+
+<ul>
+    {% suspense obj %}
+        {% fallback %}
+            <li class="skeleton">Loading ... </li>
+        {% endfallback %}
+
+        {% for data in obj %}
+            <li>{{ data }}</li>
+        {% endfor %}
+    {% endsuspense %}
+
+    {% suspense obj2 %}
+        {% fallback %}
+            <li class="skeleton">Loading 2... </li>
+        {% endfallback %}
+
+        {% for data in obj2 %}
+            <li>{{ data }}</li>
+        {% endfor %}
+    {% endsuspense %}
+</ul>
+```
+
 
 ## Contributing
 If you would like to suggest a new feature, you can create an issue on the GitHub repository for this project.
