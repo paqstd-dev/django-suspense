@@ -143,9 +143,6 @@ async def view(request):
 
 Suspense will wait for any awaitable object to finish before rendering the suspense tags.
 
-However you must take the following in consideration:
-- synchronous streaming response with AGSI will wait for the full render before sending the response to the client.
-
 ### Specify which awaitable to wait for
 
 If you have multiple suspense blocks with different awaitable, you can specify which awaitable to wait for.
@@ -177,6 +174,10 @@ Ex: `{% suspense obj %}`
     {% endsuspense %}
 </ul>
 ```
+
+### ASGI notes
+- synchronous streaming response with AGSI will wait for the full render before sending the response to the client.
+- the actual `suspense` rendering is done synchronously unlike the synchronous version. Make sure to keep the very slow code out of template rendering as much as possible.  
 
 
 ## Contributing
