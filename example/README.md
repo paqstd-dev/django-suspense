@@ -32,3 +32,21 @@ Now that everything is ready, you can start the local server:
 ```bash
 PYTHONPATH=$PWD/../ ./manage.py runserver
 ```
+
+
+# ASGI
+
+## Install unicorn
+```bash
+pip install -r requirements.txt uvicorn
+```
+
+## Run ASGI server
+
+```bash
+PYTHONPATH=$PWD/../ python -m uvicorn example.asgi:application
+```
+
+## Test the async view
+
+You must use https://127.0.0.1/async/ or https://127.0.0.1/async/class-view/ to test the async views.
