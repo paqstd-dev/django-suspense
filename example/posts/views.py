@@ -32,9 +32,7 @@ async def async_posts(request):
         await asyncio.sleep(5)
         return [a async for a in Post.objects.all()]
 
-    return async_render(
-        request, 'posts/all.html', {'posts': fetch_posts()}
-    )
+    return async_render(request, 'posts/all.html', {'posts': fetch_posts()})
 
 
 class AsyncPostTemplateView(AsyncSuspenseTemplateView):
