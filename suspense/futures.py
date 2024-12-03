@@ -2,8 +2,6 @@ import asyncio
 import inspect
 import uuid
 
-from asgiref.sync import sync_to_async
-
 
 def create(nodelist, context):
     key = str(uuid.uuid4())
@@ -40,6 +38,6 @@ def create_async(nodelist, context, async_context_keys):
             new_context[k] = v
 
         context.push(new_context)
-        return key, await sync_to_async(nodelist.render)(context)
+        return key, await asyncio.to_thread(nodelist.render, context)
 
     return key, task()

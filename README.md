@@ -198,8 +198,6 @@ async def view(request):
 
 ### ASGI notes
 - synchronous streaming response with AGSI will wait for the full render before sending the response to the client.
-- the actual `suspense` rendering is done synchronously unlike the synchronous version. Make sure to keep the very slow code out of template rendering as much as possible.
-
 
 ## Contributing
 If you would like to suggest a new feature, you can create an issue on the GitHub repository for this project.
