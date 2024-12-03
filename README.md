@@ -138,16 +138,16 @@ async def view(request):
         await asyncio.sleep(1)
         return range(10)
 
-    return async_render(request, 'template.html', {'obj': asyncio.create_task(obj())})
+    return async_render(request, 'template.html', {'obj': obj()})
 ```
 
 Suspense will wait for any awaitable object to finish before rendering the suspense tags.
 
 ### Specify which awaitable to wait for
 
-If you have multiple suspense blocks with different awaitable, you can specify which awaitable to wait for.
+If you have multiple suspense blocks with different awaitable, you can specify which awaitable to wait for or each suspense block will await everything.
 
-Ex: `{% suspense obj %}`
+Ex: `{% suspense obj obj2 %}`
 
 ```jinja
 {% load suspense %}
@@ -174,6 +174,27 @@ Ex: `{% suspense obj %}`
     {% endsuspense %}
 </ul>
 ```
+
+Important: If your async context variable is used by more than one suspense block, or you did not specify any variables on the tags, make sure to wrap your coroutines in tasks so they can be awaited multiple times.
+
+Ex: `asyncio.create_task(obj())`
+
+```python
+import asyncio
+
+from suspense.shortcuts import async_render
+
+
+# app/views.py
+async def view(request):
+    async def obj():
+        await asyncio.sleep(1)
+        return range(10)
+
+    task_obj = asyncio.create_task(obj())
+    return async_render(request, 'template.html', {'obj': task_obj})
+```
+
 
 ### ASGI notes
 - synchronous streaming response with AGSI will wait for the full render before sending the response to the client.

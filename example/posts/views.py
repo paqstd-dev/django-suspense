@@ -33,7 +33,7 @@ async def async_posts(request):
         return [a async for a in Post.objects.all()]
 
     return async_render(
-        request, 'posts/all.html', {'posts': asyncio.create_task(fetch_posts())}
+        request, 'posts/all.html', {'posts': fetch_posts()}
     )
 
 
@@ -45,4 +45,4 @@ class AsyncPostTemplateView(AsyncSuspenseTemplateView):
             await asyncio.sleep(5)
             return [a async for a in Post.objects.all()]
 
-        return {'posts': asyncio.create_task(fetch_posts())}
+        return {'posts': fetch_posts()}
