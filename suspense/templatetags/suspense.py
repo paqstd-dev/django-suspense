@@ -3,7 +3,7 @@ from copy import copy
 from django import template
 from django.utils.safestring import mark_safe
 
-from suspense.futures import create
+from suspense.futures import create, create_async
 
 register = template.Library()
 
@@ -12,6 +12,7 @@ register = template.Library()
 def suspense_tag(parser, token):
     nodelist = parser.parse(("endsuspense",))
 
+    async_context_keys = token.split_contents()[1:]
     try:
         loader = nodelist.pop(
             nodelist.index(
@@ -23,16 +24,22 @@ def suspense_tag(parser, token):
 
     parser.delete_first_token()
 
-    return SuspenseNode(loader, nodelist)
+    return SuspenseNode(loader, nodelist, async_context_keys)
 
 
 class SuspenseNode(template.Node):
-    def __init__(self, loading, nodelist):
+    def __init__(self, loading, nodelist, async_context_keys):
         self.loading = loading
         self.nodelist = nodelist
+        self.async_context_keys = async_context_keys
 
     def render(self, context):
-        uid, task = create(self.nodelist, copy(context))
+        if context["is_async"]:
+            uid, task = create_async(
+                self.nodelist, copy(context), self.async_context_keys
+            )
+        else:
+            uid, task = create(self.nodelist, copy(context))
         request = context["request"]
         if not hasattr(request, "_suspense"):
             request._suspense = []

@@ -11,6 +11,14 @@ class Post(models.Model):
 
     @property
     def read_time(self):
-        time.sleep(1)
-
         return randrange(10)
+
+
+class SlowPost(Post):
+    @property
+    def read_time(self):
+        time.sleep(1)
+        return randrange(10)
+
+    class Meta:
+        proxy = True
