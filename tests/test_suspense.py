@@ -1,3 +1,4 @@
+import pytest
 from django import template
 from django.http import HttpRequest
 
@@ -15,7 +16,7 @@ def test_suspense():
         {% endsuspense %}
     """
         )
-        .render(context={"request": request})
+        .render(context={"request": request, "is_async": False})
     )
 
     assert 'abcdefg' not in html
@@ -24,6 +25,34 @@ def test_suspense():
     assert len(request._suspense) == 1
     task = request._suspense[0]
     result = task()
+    assert isinstance(result, tuple)
+    assert isinstance(result[0], str)
+    assert 'abcdefg' in result[1]
+
+
+@pytest.mark.asyncio
+async def test_suspense_async():
+    request = HttpRequest()
+    html = (
+        template.engines['django']
+        .from_string(
+            """
+        {% load suspense %}
+
+        {% suspense %}
+            abcdefg
+        {% endsuspense %}
+    """
+        )
+        .render(context={"request": request, "is_async": True})
+    )
+
+    assert 'abcdefg' not in html
+    assert hasattr(request, "_suspense")
+    assert isinstance(request._suspense, list)
+    assert len(request._suspense) == 1
+    task = request._suspense[0]
+    result = await task
     assert isinstance(result, tuple)
     assert isinstance(result[0], str)
     assert 'abcdefg' in result[1]
@@ -45,7 +74,7 @@ def test_fallback():
         {% endsuspense %}
     """
         )
-        .render(context={"request": request})
+        .render(context={"request": request, "is_async": False})
     )
 
     assert 'abcdefg' not in html
@@ -55,6 +84,38 @@ def test_fallback():
     assert len(request._suspense) == 1
     task = request._suspense[0]
     result = task()
+    assert isinstance(result, tuple)
+    assert isinstance(result[0], str)
+    assert 'abcdefg' in result[1]
+
+
+@pytest.mark.asyncio
+async def test_fallback_async():
+    request = HttpRequest()
+    html = (
+        template.engines['django']
+        .from_string(
+            """
+        {% load suspense %}
+
+        {% suspense %}
+            {% fallback %}
+                loading...
+            {% endfallback %}
+            abcdefg
+        {% endsuspense %}
+    """
+        )
+        .render(context={"request": request, "is_async": True})
+    )
+
+    assert 'abcdefg' not in html
+    assert 'loading...' in html
+    assert hasattr(request, "_suspense")
+    assert isinstance(request._suspense, list)
+    assert len(request._suspense) == 1
+    task = request._suspense[0]
+    result = await task
     assert isinstance(result, tuple)
     assert isinstance(result[0], str)
     assert 'abcdefg' in result[1]
