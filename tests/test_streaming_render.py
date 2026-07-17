@@ -3,7 +3,11 @@ import asyncio
 import pytest
 from django.http import HttpRequest
 
-from suspense.streaming_render import async_streaming_render, streaming_render
+from suspense.streaming_render import (
+    _render_replacer,
+    async_streaming_render,
+    streaming_render,
+)
 
 
 def test_streaming_render():
@@ -96,3 +100,28 @@ async def test_async_streaming_render_cancel(caplog):
         await streaming_content.__anext__()
 
     assert len(caplog.records) == 0
+
+
+@pytest.mark.asyncio
+async def test_async_streaming_render_shared_coroutine():
+    async def shared_loader():
+        return 'bar'
+
+    streaming_content = async_streaming_render(
+        HttpRequest(), "test_suspense_shared.html", {"shared": shared_loader()}
+    )
+
+    first = await streaming_content.__anext__()
+    assert 'first-fallback' in first
+    assert 'second-fallback' in first
+
+    chunks = [await streaming_content.__anext__(), await streaming_content.__anext__()]
+    assert any('first-bar' in chunk for chunk in chunks)
+    assert any('second-bar' in chunk for chunk in chunks)
+    with pytest.raises(StopAsyncIteration):
+        await streaming_content.__anext__()
+
+
+def test_render_replacer_escapes_js_template_literal():
+    html = _render_replacer('a`b\\c${d}', HttpRequest(), 'uid123', None)
+    assert 'a\\`b\\\\c\\${d}' in html

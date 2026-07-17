@@ -34,13 +34,23 @@ class SuspenseNode(template.Node):
         self.async_context_keys = async_context_keys
 
     def render(self, context):
-        if context["is_async"]:
+        request = context.get("request", None)
+        is_async = context.get("_suspense_is_async", None)
+        if request is None or is_async is None:
+            # not a streaming response: render inline
+            return self.nodelist.render(context)
+
+        if is_async:
+            if not hasattr(request, "_suspense_shared"):
+                request._suspense_shared = {}
             uid, task = create_async(
-                self.nodelist, copy(context), self.async_context_keys
+                self.nodelist,
+                copy(context),
+                self.async_context_keys,
+                request._suspense_shared,
             )
         else:
             uid, task = create(self.nodelist, copy(context))
-        request = context["request"]
         if not hasattr(request, "_suspense"):
             request._suspense = []
         request._suspense.append(task)
@@ -71,7 +81,8 @@ class FallbackNode(template.Node):
 
 @register.simple_tag(name="webkit_extra_invisible_bytes", takes_context=True)
 def webkit_extra_invisible_bytes(context, byte_count=200):
-    agent = context["request"].META.get('HTTP_USER_AGENT', '')
+    request = context.get("request", None)
+    agent = request.META.get('HTTP_USER_AGENT', '') if request else ''
     if byte_count > 0 and 'AppleWebKit' in agent:
         zero_width_spaces = byte_count * "\u200b"
         return mark_safe(f'<div style="width: 0; height: 0;">{zero_width_spaces}</div>')

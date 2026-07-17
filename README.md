@@ -175,25 +175,7 @@ Ex: `{% suspense obj obj2 %}`
 </ul>
 ```
 
-Important: If your async context variable is used by more than one suspense block, or you did not specify any variables on the tags, make sure to wrap your coroutines in tasks so they can be awaited multiple times.
-
-Ex: `asyncio.create_task(obj())`
-
-```python
-import asyncio
-
-from suspense.shortcuts import async_render
-
-
-# app/views.py
-async def view(request):
-    async def obj():
-        await asyncio.sleep(1)
-        return range(10)
-
-    task_obj = asyncio.create_task(obj())
-    return async_render(request, 'template.html', {'obj': task_obj})
-```
+Note: awaitables are wrapped in `asyncio` tasks internally, so the same coroutine can safely be shared by multiple suspense blocks — each block will await the same task and receive the same result.
 
 
 ### ASGI notes
@@ -215,4 +197,4 @@ uvx pre-commit install         # enable git hooks (optional)
 ```
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for more information.
+This project is licensed under the MIT License. See the LICENCE file for more information.

@@ -16,7 +16,7 @@ def test_suspense():
         {% endsuspense %}
     """
         )
-        .render(context={"request": request, "is_async": False})
+        .render(context={"request": request, "_suspense_is_async": False})
     )
 
     assert 'abcdefg' not in html
@@ -44,7 +44,7 @@ async def test_suspense_async():
         {% endsuspense %}
     """
         )
-        .render(context={"request": request, "is_async": True})
+        .render(context={"request": request, "_suspense_is_async": True})
     )
 
     assert 'abcdefg' not in html
@@ -52,10 +52,52 @@ async def test_suspense_async():
     assert isinstance(request._suspense, list)
     assert len(request._suspense) == 1
     task = request._suspense[0]
-    result = await task
+    result = await task()
     assert isinstance(result, tuple)
     assert isinstance(result[0], str)
     assert 'abcdefg' in result[1]
+
+
+def test_suspense_without_streaming_context():
+    request = HttpRequest()
+    html = (
+        template.engines['django']
+        .from_string(
+            """
+        {% load suspense %}
+
+        {% suspense %}
+            {% fallback %}
+                loading...
+            {% endfallback %}
+            abcdefg
+        {% endsuspense %}
+    """
+        )
+        .render(context={"request": request})
+    )
+
+    assert 'abcdefg' in html
+    assert 'loading...' not in html
+    assert not hasattr(request, "_suspense")
+
+
+def test_suspense_without_request():
+    html = (
+        template.engines['django']
+        .from_string(
+            """
+        {% load suspense %}
+
+        {% suspense %}
+            abcdefg
+        {% endsuspense %}
+    """
+        )
+        .render(context={"_suspense_is_async": False})
+    )
+
+    assert 'abcdefg' in html
 
 
 def test_fallback():
@@ -74,7 +116,7 @@ def test_fallback():
         {% endsuspense %}
     """
         )
-        .render(context={"request": request, "is_async": False})
+        .render(context={"request": request, "_suspense_is_async": False})
     )
 
     assert 'abcdefg' not in html
@@ -106,7 +148,7 @@ async def test_fallback_async():
         {% endsuspense %}
     """
         )
-        .render(context={"request": request, "is_async": True})
+        .render(context={"request": request, "_suspense_is_async": True})
     )
 
     assert 'abcdefg' not in html
@@ -115,7 +157,7 @@ async def test_fallback_async():
     assert isinstance(request._suspense, list)
     assert len(request._suspense) == 1
     task = request._suspense[0]
-    result = await task
+    result = await task()
     assert isinstance(result, tuple)
     assert isinstance(result[0], str)
     assert 'abcdefg' in result[1]
@@ -153,4 +195,20 @@ def test_webkit_extra_invisible_bytes_webkit():
         .render(context={"request": request})
     )
 
-    assert '<div style="width: 0;height:0">\u200b\u200b</div>' not in html
+    assert '<div style="width: 0; height: 0;">\u200b\u200b</div>' in html
+
+
+def test_webkit_extra_invisible_bytes_without_request():
+    html = (
+        template.engines['django']
+        .from_string(
+            """
+        {% load suspense %}
+
+        {% webkit_extra_invisible_bytes 2 %}
+    """
+        )
+        .render(context={})
+    )
+
+    assert 'div' not in html
