@@ -203,5 +203,16 @@ async def view(request):
 If you would like to suggest a new feature, you can create an issue on the GitHub repository for this project.
 Also you can fork the repository and submit a pull request with your changes.
 
+### Development
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management:
+
+```bash
+uv sync                        # create .venv and install dev dependencies
+uv run pytest --cov            # run tests
+uv run ruff check .            # lint
+uv run ruff format .           # format
+uvx pre-commit install         # enable git hooks (optional)
+```
+
 ## License
 This project is licensed under the MIT License. See the LICENSE file for more information.
