@@ -1,0 +1,9 @@
+{% load suspense %}
+{% suspense shared %}
+    {% fallback %}first-fallback{% endfallback %}
+    first-{{ shared }}
+{% endsuspense %}
+{% suspense shared %}
+    {% fallback %}second-fallback{% endfallback %}
+    second-{{ shared }}
+{% endsuspense %}
